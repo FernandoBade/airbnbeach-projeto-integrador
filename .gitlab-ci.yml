@@ -1,0 +1,85 @@
+stages:
+  - build
+  - test
+  - deploy
+
+# build_dev_back:
+#   stage: build
+#   image: maven:3.8.7-openjdk-18-slim
+#   script:
+#     - echo "Building backend :)"
+#     - cd digital_booking
+#     - mvn clean install
+#     - echo "Finished building the backend :)"
+#   artifacts:
+#     expire_in: 1 week
+#     paths:
+#       - digital_booking/target/digital_booking_API.jar
+#   only:
+#     - dev
+
+
+build_dev_front:
+  stage: build
+  image: node:lts
+  script:
+    - echo "Iniciando build do frontend"
+    - cd projeto-integrador
+    - npm install
+    - npm run build
+    - echo "Build realizado com sucesso"
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - fro
+  only:
+    - dev
+
+
+
+# deploy_dev_back:
+#   stage: deploy
+#   image: alpine:3.11
+#   before_script:
+#     - apk update && apk add openssh-client bash
+#     - mkdir -p ~/.ssh
+#     - eval $(ssh-agent -s)
+#     - echo "$SSH_DEV_BACK_KEY" | tr -d '\r' | ssh-add - > /dev/null
+#     - touch ~/.ssh/config
+#     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+#     - ssh-keyscan -H $DEPLOY_SERVER_DEV_BACKEND >> ~/.ssh/known_hosts
+#   script:
+#     - echo "Deploying started..."
+#     - ssh ubuntu@$DEPLOY_SERVER_DEV_BACKEND "sudo systemctl stop api-sys.service"
+#     - scp ./digital_booking/target/digital_booking_API.jar ubuntu@$DEPLOY_SERVER_DEV_BACKEND:~/api-sys/
+#     - ssh ubuntu@$DEPLOY_SERVER_DEV_BACKEND "sudo systemctl start api-sys.service"
+#     - echo "Finished deploying the app."
+#   only:
+#     - dev
+
+# deploy_dev_front:
+#   stage: deploy
+#   image: alpine:3.11
+#   before_script:
+#     - apk update && apk add openssh-client bash
+#     - mkdir -p ~/.ssh
+#     - eval $(ssh-agent -s)
+#     - echo "$SSH_DEV_FRONT_KEY" | tr -d '\r' | ssh-add - > /dev/null+
+#     - touch ~/.ssh/config
+#     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+#     - ssh-keyscan -H $DEPLOY_SERVER_DEV_FRONT >> ~/.ssh/known_hosts
+#   script:
+#     - echo "Deploy Iniciado..."
+#     - echo "Criando pasta temporária no servidor..."
+#     - ssh ubuntu@$DEPLOY_SERVER_DEV_FRONT "mkdir ~/temp"
+#     - echo "Copiando arquivos para o servidor..."
+#     - scp -Cr -i $SSH_DEV_FRONT_KEY_FILE ./projeto-integrador/dist/* ubuntu@$DEPLOY_SERVER_DEV_FRONT:~/temp
+#     - echo "Limpando WWW do servidor..."
+#     - ssh ubuntu@$DEPLOY_SERVER_DEV_FRONT "sudo rm -r /var/www/$DEPLOY_SERVER_DEV_FRONT/home/*"
+#     - echo "Movendo arquivos para a pasta correta no servidor..."
+#     - ssh ubuntu@$DEPLOY_SERVER_DEV_FRONT "sudo cp -r ~/temp/* /var/www/$DEPLOY_SERVER_DEV_FRONT/home"
+#     - echo "Excluindo temp..."
+#     - ssh ubuntu@$DEPLOY_SERVER_DEV_FRONT "sudo rm -r ~/temp/"
+#     - echo "Finished deploying the app."
+#   only:
+#     - dev
